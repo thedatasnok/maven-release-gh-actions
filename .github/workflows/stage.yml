@@ -1,0 +1,40 @@
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - 'major'
+          - 'minor'
+          - 'patch'
+      skipPerform:
+        description: 'Skip release perform'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  perform-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+
+      - name: Perform release
+        uses: qcastel/github-actions-maven-release@master
+        with: 
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          version-major: ${{ inputs.releaseType == 'major' }}
+          version-minor: ${{ inputs.releaseType == 'minor' }}
+          version-patch: ${{ inputs.releaseType == 'patch' }}
