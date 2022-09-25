@@ -41,3 +41,4 @@ jobs:
           version-minor: ${{ inputs.releaseType == 'minor' }}
           version-patch: ${{ inputs.releaseType == 'patch' }}
           release-branch-name: 'main'
+          maven-args: "-Dmaven.javadoc.skip=true -Ddockerfile.skip -DdockerCompose.skip -Dmaven.deploy.skip=true"
