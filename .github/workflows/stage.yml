@@ -38,3 +38,4 @@ jobs:
           version-major: ${{ inputs.releaseType == 'major' }}
           version-minor: ${{ inputs.releaseType == 'minor' }}
           version-patch: ${{ inputs.releaseType == 'patch' }}
+          release-branch-name: 'main'
