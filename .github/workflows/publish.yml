@@ -1,9 +1,10 @@
 name: Publish release
 
 on:
-  push:
-    tags:        
-      - "v*.*.*"
+  workflow_run:
+    workflows: ["Stage release"]
+    types:
+      - completed
 
 jobs:
   create-release:
