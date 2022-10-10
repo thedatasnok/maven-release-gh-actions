@@ -24,8 +24,10 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
+
+      - uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-key: "${{ secrets.SSH_PRIVATE_KEY }}"
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set GitHub Actions as commit author
         shell: bash
