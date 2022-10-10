@@ -25,7 +25,7 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v2
         with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-key: "${{ secrets.SSH_PRIVATE_KEY }}"
 
       - name: Set GitHub Actions as commit author
         shell: bash
