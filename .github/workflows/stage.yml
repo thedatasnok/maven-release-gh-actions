@@ -55,16 +55,14 @@ jobs:
 
       - name: Bump next minor development version
         if: ${{ inputs.releaseType == 'minor' }}
-        run: |
-          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0-SNAPSHOT
-          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
-          echo "::set-output name=version::$VERSION"
-        id: development_version
+        run: mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0-SNAPSHOT
 
       - name: Bump next major development version
         if: ${{ inputs.releaseType == 'major' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
+
+      - name: Resolve development version
         run: |
-          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "::set-output name=version::$VERSION"
         id: development_version
