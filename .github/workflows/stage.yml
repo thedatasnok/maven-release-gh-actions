@@ -24,6 +24,14 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set GitHub Actions as commit author
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -32,15 +40,41 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      - name: Perform release
-        uses: qcastel/github-actions-maven-release@master
-        env:
-          JAVA_HOME: /usr/lib/jvm/java-11-openjdk/
-        with: 
-          git-release-bot-name: "github-actions[bot]"
-          git-release-bot-email: "41898282+github-actions[bot]@users.noreply.github.com"
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          version-major: ${{ inputs.releaseType == 'major' }}
-          version-minor: ${{ inputs.releaseType == 'minor' }}
-          release-branch-name: 'main'
-          maven-args: "-Dmaven.javadoc.skip=true -Ddockerfile.skip -DdockerCompose.skip -Dmaven.deploy.skip=true"
+      - name: Get initial version
+        run: |
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "::set-output name=version::$VERSION"
+        id: initial_version
+
+      - name: Resolve release version
+        run: |
+          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "::set-output name=version::$VERSION"
+        id: release_version
+
+      - name: Bump next minor development version
+        if: ${{ inputs.releaseType == 'minor' }}
+        run: |
+          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0-SNAPSHOT
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "::set-output name=version::$VERSION"
+        id: development_version
+
+      - name: Bump next major development version
+        if: ${{ inputs.releaseType == 'major' }}
+        run: |
+          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "::set-output name=version::$VERSION"
+        id: development_version
+
+      - name: Reset to initial version
+        run: mvn versions:set -DnewVersion=${{ steps.initial_version.outputs.version }}
+
+      - name: Perform Maven Relese
+        run: 
+          mvn release:clean release:prepare release:perform 
+            -DreleaseVersion=${{ steps.release_version.outputs.version }} 
+            -DdevelopmentVersion=${{ steps.development_version.outputs.version }} 
+            -Darguments="-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true"
