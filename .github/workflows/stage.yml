@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -37,8 +39,8 @@ jobs:
         env:
           JAVA_HOME: /usr/lib/jvm/java-11-openjdk/
         with: 
-          git-release-bot-name: "thedatasnok"
-          git-release-bot-email: "47036430+thedatasnok@users.noreply.github.com"
+          git-release-bot-name: "github-actions[bot]"
+          git-release-bot-email: "41898282+github-actions[bot]@users.noreply.github.com"
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           version-major: ${{ inputs.releaseType == 'major' }}
           version-minor: ${{ inputs.releaseType == 'minor' }}
