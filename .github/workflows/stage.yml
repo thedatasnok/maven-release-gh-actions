@@ -24,10 +24,8 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
-
-      - uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set GitHub Actions as commit author
         shell: bash
@@ -50,18 +48,18 @@ jobs:
 
       - name: Resolve release version
         run: |
-          mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+          mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "::set-output name=version::$VERSION"
         id: release_version
 
       - name: Bump next minor development version
-        if: ${{ inputs.releaseType == 'minor' }}
-        run: mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0-SNAPSHOT
+        if: \${{ inputs.releaseType == 'minor' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT
 
       - name: Bump next major development version
-        if: ${{ inputs.releaseType == 'major' }}
-        run: mvn build-helper:parse-version versions:set -DnewVersion=${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
+        if: \${{ inputs.releaseType == 'major' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
 
       - name: Resolve development version
         run: |
@@ -70,11 +68,11 @@ jobs:
         id: development_version
 
       - name: Reset to initial version
-        run: mvn versions:set -DnewVersion=${{ steps.initial_version.outputs.version }}
+        run: mvn versions:set -DnewVersion=\${{ steps.initial_version.outputs.version }}
 
       - name: Perform Maven Relese
         run: 
           mvn release:clean release:prepare release:perform 
-            -DreleaseVersion=${{ steps.release_version.outputs.version }} 
-            -DdevelopmentVersion=${{ steps.development_version.outputs.version }} 
+            -DreleaseVersion=\${{ steps.release_version.outputs.version }} 
+            -DdevelopmentVersion=\${{ steps.development_version.outputs.version }} 
             -Darguments="-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true"
