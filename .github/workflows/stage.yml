@@ -60,11 +60,11 @@ jobs:
         id: release_version
 
       - name: Bump next minor development version
-        if: \${{ inputs.releaseType == 'minor' }}
+        if: ${{ inputs.releaseType == 'minor' }}
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT
 
       - name: Bump next major development version
-        if: \${{ inputs.releaseType == 'major' }}
+        if: ${{ inputs.releaseType == 'major' }}
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT
 
       - name: Resolve development version
@@ -91,5 +91,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'publish.yml',
-              ref: 'v${{ steps.release_version.outputs.version }}',
+              ref: 'main',
+              inputs: {
+                tag_ref: 'v${{ steps.release_version.outputs.version }}',
+              },
             })
