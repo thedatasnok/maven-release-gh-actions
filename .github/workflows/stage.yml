@@ -91,5 +91,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'publish.yml',
-              ref: v${{ steps.release_version.outputs.version }},
+              ref: 'v${{ steps.release_version.outputs.version }}',
             })
