@@ -57,7 +57,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'publish.yml',
-              ref: 'v${{ inputs.releaseVersion }}',
+              ref: 'main',
               inputs: {
                 tag_ref: 'v${{ inputs.releaseVersion }}',
               },
