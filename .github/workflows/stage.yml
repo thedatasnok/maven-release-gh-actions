@@ -1,4 +1,4 @@
-name: Stage release
+name: Stage release with bump version
 
 on:
   workflow_dispatch:
@@ -11,11 +11,6 @@ on:
         options:
           - 'major'
           - 'minor'
-      skipPerform:
-        description: 'Skip release perform'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   perform-release:
