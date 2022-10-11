@@ -15,14 +15,9 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.tag_ref }}
 
       - name: Merge release tag to main branch
-        run: |
-          git fetch origin
-          git checkout main
-          git merge ${{ inputs.tag_ref }}
+        run: git merge ${{ inputs.tag_ref }}
 
       - name: Set up Java
         uses: actions/setup-java@v3
