@@ -18,6 +18,7 @@ jobs:
 
       - name: Merge release tag to main branch
         run: |
+          git fetch
           git merge ${{ inputs.tag_ref }}
           git push
 
